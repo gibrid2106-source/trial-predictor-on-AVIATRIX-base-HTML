@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aviatrix Predictor 🔮</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: radial-gradient(circle at top, #222, #000);
+        color: white;
+        text-align: center;
+        padding: 30px;
+    }
+    h1 {
+        color: #00ffc8;
+        text-shadow: 0 0 10px #00ffc8;
+    }
+    input {
+        padding: 10px;
+        width: 60%;
+        border: none;
+        border-radius: 6px;
+        margin: 10px;
+        font-size: 16px;
+    }
+    button {
+        background-color: #00ffc8;
+        border: none;
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        margin: 10px;
+        transition: 0.3s;
+    }
+    button:hover {
+        background-color: #00bfa5;
+    }
+    .result {
+        margin-top: 20px;
+        font-size: 20px;
+        font-weight: bold;
+    }
+    .low {
+        color: #ff3b3b;
+    }
+    .high {
+        color: #00ffc8;
+    }
+</style>
+</head>
+<body>
+
+<h1>🔮 Aviatrix Predictor</h1>
+<p>Введи последние коэффициенты (через запятую):</p>
+
+<input type="text" id="coeffs" placeholder="Например: 1.2, 1.5, 2.3, 1.1, 5.6">
+<br>
+<button onclick="predict()">Предсказать</button>
+
+<div class="result" id="result"></div>
+
+<script>
+function predict() {
+    const input = document.getElementById("coeffs").value;
+    if (!input) return;
+
+    // Преобразуем ввод в массив чисел
+    const coeffs = input.split(",").map(x => parseFloat(x.trim())).filter(x => !isNaN(x));
+
+    const LOW_LIMIT = 2.0;
+    const HIGH_LIMIT = 15.0;
+    const LOOKBACK = 3;
+
+    if (coeffs.length < LOOKBACK) {
+        document.getElementById("result").innerHTML = "❗ Введи хотя бы " + LOOKBACK + " коэффициента.";
+        return;
+    }
+
+    // Считаем сколько последних множителей были низкими
+    const last = coeffs.slice(-LOOKBACK);
+    const lowCount = last.filter(x => x < LOW_LIMIT).length;
+
+    // Имитация вероятности (по аналогии с анализом)
+    // Чем больше подряд низких — тем выше шанс "высокого"
+    const baseProb = 0.15;
+    const bonus = lowCount * 0.15;
+    const prob = Math.min(baseProb + bonus, 0.8);
+
+    let message = `После ${lowCount} низких множителей подряд, `;
+    message += `вероятность большого (>5.0): <span class='high'>${(prob * 100).toFixed(1)}%</span>`;
+
+    document.getElementById("result").innerHTML = message;
+}
+</script>
+
+</body>
+</html>
